@@ -1,68 +1,71 @@
-var canJump = true;
-var startedGame = false
-var dinoFoot = "left"
+var gStartedGame = false
+var cactii = []
 $(function(){
-	dino = $('#dino')
+	dino = new Dino()
+	cact = new Cactus()
 	document.onkeydown = function(event) {
-		event.preventDefault()
-		if (!startedGame) {
-			startedGame = true
-			dino.addClass('walk-0')
-		}
-		if (canJump && event.keyCode == 32) {
-			dino.css({
-				'animation-play-state' : "running"
-			})
-			canJump = false;
-			setTimeout(function(){
-				dino.css({
-					'animation-play-state' : "paused"
-				});
-				canJump = true;
-			},500)
-			
-		};
-	};
-	document.onkeyup = function(event) {
+		event.preventDefault();
 		if (event.keyCode == 32) {
-				
-		};
+			if (!gStartedGame) {
+				console.log("satrtr")
+				startGame()
+			}
+			dino.jump()
+		}
 	};
-	document.getElementById('dino').addEventListener("animationend",function(){
-		console.log("done jumping!!")
-	});
-});
-var walkCycle = setInterval(function(){
-	console.log("walking")
-	console.log(dino)
-	if (dino.hasClass('walk-1')) {
-		$('#dino').addClass('walk-0')
-		$('#dino').removeClass('walk-1')
-		dinoFoot = "right"
-	} else if (dino.hasClass('walk-0')) {
-		$('#dino').addClass('walk-1')
-		$('#dino').removeClass('walk-0')
-		dinoFoot = "left"
+	var touchStart = function(event) {
+		if (!gStartedGame) {
+			startGame()
+		}
+		dino.jump()
 	}
-},150)
-
-// touchStart = function(event) {
-// 	touchingDPad = true
-// 	var touch = {
-// 			id: event.changedTouches[0].identifier || 0,
-// 			pos: {x:event.changedTouches[0].clientX,y:event.changedTouches[0].clientY}
-// 	}
-// 	touches.push(touch);
-// }
-// touchMove = function(event) {
-// 	if (touches.length) {
-// 			touches[0].pos = {x:event.changedTouches[0].clientX,y:event.changedTouches[0].clientY}
-// 	}
-// }
-// touchEnd = function(event) {
-// 	var touch = {x:event.changedTouches[0].clientX,y:event.changedTouches[0].clientY}
-// 	touches.splice(touches.indexOf(touch),1)
-// }
-// document.body.addEventListener('touchstart',touchStart,true)
-// document.body.addEventListener('touchmove',touchMove,true)
-// document.body.addEventListener('touchend',touchEnd,true)
+	document.body.addEventListener('touchstart',touchStart,true)
+});
+function startGame() {
+	gStartedGame = true
+	dino.startWalking()
+}
+function Dino() {
+	this.div = $('#dino')
+	this.canJump = true
+	this.foot = "left"
+	this.jump = function() {
+		if (this.canJump) {
+			this.div.css({
+				'animation-play-state' : "running",
+			});
+			this.canJump = false;
+			var self = this;
+			setTimeout(function(){
+				self.div.css({
+					'animation-play-state' : "paused",
+					'top' : '415px'
+				});
+				self.canJump = true;
+			},500);
+		}
+	}
+	this.startWalking = function() {
+		console.log("walking?")
+		var self = this;
+		this.walkCycle = setInterval(function(){
+			if (self.foot === "left") {
+				console.log("add?")
+				self.div.addClass('walk-0')
+				self.div.removeClass('walk-1')
+				self.foot = "right"
+			} else {
+				self.div.addClass('walk-1')
+				self.div.removeClass('walk-0')
+				self.foot = "left"
+			}
+		},150)
+	}
+	this.stopWalking = function() {
+		clearInterval(this.walkCycle)
+	}
+}
+function Cactus(type) {
+	this.html = `<div class="cactus" id=`+cactii.length+`></div>`
+	$('#stage').append(this.html)
+}

@@ -27,7 +27,7 @@ body {
 	animation-iteration-count: infinite;
 	animation-timing-function: ease-in-out;
 	animation-play-state: paused;
-	z-index: 4
+	z-index: 4;
 }
 .standing {
 	background-image: url("../img/dinostanding.png");
@@ -41,9 +41,16 @@ body {
 .dead {
 	background-image: url("../img/dinodead.png");
 }
+.cactus {
+	position:relative;
+	width:60px;
+	height:96px;
+	top:315px;
+	background-image: url("../img/cactuslarge.png");
+}
 @keyframes jump {
 	50% {
-    top: 320px;
+    top: 280px;
   }
 }
 @media screen and (orientation:portrait) {
