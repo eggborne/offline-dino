@@ -1,9 +1,9 @@
 
-# Application Name
+# Chrome Offline Dinosaur Game
 
-#### _Short description, date_
+#### A CSS/Javascript rendition of the beloved timewaster.
 
-#### By Dr. Charles Bronson
+#### By Michael Donovan
 
 
 ## Description
