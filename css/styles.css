@@ -30,23 +30,33 @@ body {
 	z-index: 4;
 }
 .standing {
-	background-image: url("/img/dinostanding.png");
+	background-image: url("img/dinostanding.png");
 }
 .walk-0 {
-	background-image: url("/img/dinostep0.png");
+	background-image: url("img/dinostep0.png");
 }
 .walk-1 {
-	background-image: url("/img/dinostep1.png");
-
+	background-image: url("img/dinostep1.png");
+}
+.dead {
+	background-image: url("img/dinodead.png");
 }
 @keyframes jump {
-  from {
-    top: 415px;
-  }
 	50% {
     top: 320px;
   }
-  to {
-    top: 415px;
-  }
+}
+@media screen and (orientation:portrait) {
+	#ground {
+		top: 200px;
+	}
+	#dino {
+		left:15%;
+		top: 215px;
+	}
+	@keyframes jump {
+		50% {
+			top: 108px;
+		}
+	}
 }
