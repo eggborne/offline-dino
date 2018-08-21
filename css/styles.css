@@ -27,19 +27,19 @@ body {
 	animation-iteration-count: infinite;
 	animation-timing-function: ease-in-out;
 	animation-play-state: paused;
-	z-index: 4;
+	z-index: 4
 }
 .standing {
-	background-image: url("img/dinostanding.png");
+	background-image: url("../img/dinostanding.png");
 }
 .walk-0 {
-	background-image: url("img/dinostep0.png");
+	background-image: url("../img/dinostep0.png");
 }
 .walk-1 {
-	background-image: url("img/dinostep1.png");
+	background-image: url("../img/dinostep1.png");
 }
 .dead {
-	background-image: url("img/dinodead.png");
+	background-image: url("../img/dinodead.png");
 }
 @keyframes jump {
 	50% {
