@@ -1,5 +1,6 @@
 var gStartedGame = false
 var cactii = []
+var counter = 0
 $(function(){
 	dino = new Dino()
 	cact = new Cactus()
@@ -7,7 +8,6 @@ $(function(){
 		event.preventDefault();
 		if (event.keyCode == 32) {
 			if (!gStartedGame) {
-				console.log("satrtr")
 				startGame()
 			}
 			dino.jump()
@@ -23,6 +23,7 @@ $(function(){
 });
 function startGame() {
 	gStartedGame = true
+	gameLoop()
 	dino.startWalking()
 }
 function Dino() {
@@ -48,7 +49,6 @@ function Dino() {
 	}
 	this.startWalking = function() {
 		cactii[0].pass(1800)
-		console.log("walking?")
 		var self = this;
 
 		this.walkCycle = setInterval(function(){
@@ -79,6 +79,10 @@ function Cactus(type) {
 	$('#stage').append(this.html)
 	cactii.push(this)
 }
-var gameLoop = function() {
-	console.log("loop " +counter)
+function gameLoop() {
+	if (counter % 60 === 0) {
+		console.log("60!")
+	}
+	counter++
+	requestAnimationFrame(gameLoop)
 }
