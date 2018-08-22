@@ -1,7 +1,8 @@
 body {
 	width: 100vw;
 	height: 100vh;
-	background-color: #eee
+	background-color: #eee;
+	overflow: hidden;
 }
 #stage {
 	width: 100%;
@@ -23,11 +24,11 @@ body {
 	top:415px;
 	left:20%;
 	animation-name: jump;
-	animation-duration: 500ms;
+	animation-duration: 600ms;
 	animation-iteration-count: infinite;
 	animation-timing-function: ease-in-out;
 	animation-play-state: paused;
-	z-index: 4;
+	z-index: 2;
 }
 .standing {
 	background-image: url("../img/dinostanding.png");
@@ -42,25 +43,19 @@ body {
 	background-image: url("../img/dinodead.png");
 }
 .cactus {
-	position:relative;
+	position:absolute;
 	width:60px;
 	height:96px;
-	top:315px;
+	top:410px;
 	left:100vw;
 	background-image: url("../img/cactuslarge.png");
-	animation-name: pass;
-	animation-duration: 1500ms;
-	animation-timing-function: linear;
-	animation-play-state: paused;
 }
 @keyframes jump {
-	50% {
+	45% {
+		top: 280px;
+	}
+	55% {
     top: 280px;
-  }
-}
-@keyframes pass {
-	100% {
-    left: -30px;
   }
 }
 @media screen and (orientation:portrait) {
