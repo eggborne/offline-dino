@@ -29,6 +29,7 @@ function Dino() {
 	this.div = $('#dino')
 	this.canJump = true
 	this.foot = "left"
+	this.divID = "cactus-"+cactii.length
 	this.jump = function() {
 		if (this.canJump) {
 			this.div.css({
@@ -46,8 +47,10 @@ function Dino() {
 		}
 	}
 	this.startWalking = function() {
+		cactii[0].pass(1800)
 		console.log("walking?")
 		var self = this;
+
 		this.walkCycle = setInterval(function(){
 			if (self.foot === "left") {
 				console.log("add?")
@@ -66,6 +69,16 @@ function Dino() {
 	}
 }
 function Cactus(type) {
-	this.html = `<div class="cactus" id=`+cactii.length+`></div>`
+	this.html = `<div class="cactus" id=`+this.divID+`></div>`;
+	this.pass = function(speed) {
+		$('#'+this.divID).css({
+			'animation-duration': speed + 'ms',
+			'animation-play-state': 'running'
+		})
+	}
 	$('#stage').append(this.html)
+	cactii.push(this)
+}
+var gameLoop = function() {
+	console.log("loop " +counter)
 }

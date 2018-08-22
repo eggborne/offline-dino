@@ -46,11 +46,21 @@ body {
 	width:60px;
 	height:96px;
 	top:315px;
+	left:100vw;
 	background-image: url("../img/cactuslarge.png");
+	animation-name: pass;
+	animation-duration: 1500ms;
+	animation-timing-function: linear;
+	animation-play-state: paused;
 }
 @keyframes jump {
 	50% {
     top: 280px;
+  }
+}
+@keyframes pass {
+	100% {
+    left: -30px;
   }
 }
 @media screen and (orientation:portrait) {
