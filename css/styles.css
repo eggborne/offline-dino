@@ -1,3 +1,10 @@
+#debug {
+	position: fixed;
+	width:300px;
+	height:100px;
+	font-size:36px;
+	margin-left:10%;
+}
 body {
 	--pixel-size: 1;
 	width: 100vw;
@@ -69,6 +76,7 @@ body {
 	pointer-events: none;
 }
 #restart-button {
+	cursor: pointer;
 	position: absolute;
 	width: calc(72px * var(--pixel-size));
 	height: calc(72px * var(--pixel-size));
@@ -80,8 +88,6 @@ body {
 	transform: scale(0.8);
 	transition: all 200ms ease;
 }
-
-
 @media screen and (orientation:portrait) {
 	#ground {
 		top: 40vh;
@@ -92,5 +98,12 @@ body {
 	}
 	.cactus {
 		top: calc(40vh + calc(14px * var(--pixel-size)));
+	}
+	#restart-button {
+		width: calc(100px * var(--pixel-size));
+		height: calc(100px * var(--pixel-size));
+		margin-left:calc(50vw - calc(50px * var(--pixel-size)));
+
+		top: 40vw;
 	}
 }

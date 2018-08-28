@@ -5,7 +5,7 @@ var gMasterSpeed = 3;
 var gravityForce = 0;
 var counter = 0;
 var pixelSize = 1;
-var restartedAt = -1
+var restartedAt = -1;
 $(function(){
 	pixelSize = (1/window.devicePixelRatio);
 	if (pixelSize < 1) {
@@ -34,6 +34,10 @@ $(function(){
 	};
 	document.body.addEventListener('touchstart',spaceAction,true);
 	// document.body.addEventListener('mousedown',spaceAction,true);
+	document.body.addEventListener('touchstart',touchStart,true);
+	document.body.addEventListener('touchmove',touchMove,true);
+	document.body.addEventListener('touchend',touchEnd,true);
+
 	$('#restart-button').click(function(){
 		$(this).addClass('hidden')
 		$('#restart-button').css({
@@ -205,7 +209,6 @@ function gameLoop(time) {
 			return
 		}
 	}
-	
 	counter++
 	requestAnimationFrame(gameLoop);
 }
@@ -214,4 +217,68 @@ Number.prototype.mod = function(num) {
 }
 function randomInt(min,max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function Touch(touchEvent) {
+	this.identifier = touchEvent.identifier;
+	this.startTime = counter;
+	this.x = touchEvent.clientX;
+	this.y = touchEvent.clientY;
+	this.startSpot = { x: this.x, y: this.y };
+	this.endSpot = {};
+	this.moveDuration = function () {
+		return counter - this.startTime;
+	}
+	this.moveDistance = function () {
+		var distance = {};
+		distance.x = this.x - this.startSpot.x;
+		distance.y = this.y - this.startSpot.y;
+		return distance
+	}
+}
+
+
+
+var touchTime;
+var currentTouches = []
+
+function touchStart(event) {
+	// event.preventDefault();
+	touchTime = Date.now();
+	for (var i=0; i<event.changedTouches.length; i++) {
+		var newTouch = event.changedTouches[i]
+		console.log("starting " + newTouch.identifier)
+		currentTouches.push(new Touch(newTouch));
+		debug ? $('#debug').append(`<span id="touch-` + newTouch.identifier + `">` + newTouch.identifier + `</span>`) : false;
+  }
+}
+function touchMove(event) {
+	// event.preventDefault();
+	var movingTouches = [];
+	for (var i=0; i<event.changedTouches.length; i++) {
+    movingTouches.push(copyTouch(event.changedTouches[i]));
+  }
+	movingTouches.forEach(function (touchEvent, i) {
+		var touchObject = new Touch(touchEvent);
+		// take each touch that moved...
+		currentTouches.forEach(function (existingTouch, j) {
+			//...find it in the list...
+			if (touchObject.identifier === existingTouch.identifier) {
+				//...replace it with the new one
+				currentTouches[j] = touchObject;
+				console.log("moved " + currentTouches[j].identifier);
+				debug ? $(`#touch-` + currentTouches[j].identifier).css({ 'color': 'green' }) : false;
+			}
+		});
+	});
+}
+function touchEnd(event) {
+	// event.preventDefault();
+	for (var i=0; i<event.changedTouches.length; i++) {
+    console.log("ending " + event.changedTouches[i].identifier);
+		currentTouches.push(copyTouch(event.changedTouches[i]));
+		debug ? $(`#touch-` + currentTouches[i].identifier).remove() : false;
+  }
+}
+function copyTouch(touch) {
+  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
 }
