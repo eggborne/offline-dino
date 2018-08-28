@@ -1,67 +1,50 @@
-var gStartedGame = false;
-var cactii = [];
-var loop;
-var gMasterSpeed = 3;
-var gravityForce = 0;
-var counter = 0;
-var pixelSize = 1;
-var restartedAt = -1;
-$(function(){
-	pixelSize = (1/window.devicePixelRatio);
-	if (pixelSize < 1) {
-		pixelSize = pixelSize.toPrecision(2)
-	}
-	document.body.style.setProperty('--pixel-size',pixelSize);
-	gravityForce = pixelSize*1.5;
-	gMasterSpeed *= pixelSize
-	dino = new Dino();
-	dino.div.animate({
-		'top':dino.groundY+'px'
-	},800,function(){
-		dino.canJump = true;
-	})
-	var spaceAction = function() {
-		if (!gStartedGame) {
-			startGame();
-		}
-		dino.leap();
-	}
-	document.onkeydown = function(event) {
-		if (event.keyCode == 32) {
-			spaceAction()
-		}
-		event.preventDefault();
-	};
-	document.body.addEventListener('touchstart',spaceAction,true);
-	// document.body.addEventListener('mousedown',spaceAction,true);
-	document.body.addEventListener('touchstart',touchStart,true);
-	document.body.addEventListener('touchmove',touchMove,true);
-	document.body.addEventListener('touchend',touchEnd,true);
+debug = true;
 
-	$('#restart-button').click(function(){
-		$(this).addClass('hidden')
-		$('#restart-button').css({
-			'transform': 'scale(0.8)'
-		})
-		gStartedGame = false;
-		counter = 0
-		cactii.length = 0;
-		$('.cactus').remove()
-		dino.revive()
-		restartedAt = counter
-	})
-	
+var game = new Game()
+$(function () {
+	game.initialize()
+	setInputs()
 });
-function startGame() {
-	requestAnimationFrame(gameLoop);
-	gStartedGame = true;
-	dino.startWalking();
-}
-function spaceAction() {
-	if (!gStartedGame && dino.diedAt < 0) {
-		startGame();
-	} else if (dino.y()===dino.groundY) {
-		dino.leap();
+function Game() {
+	this.started = false;
+	this.cactii = [];
+	this.counter = 0;
+	this.restartedAt = -1;
+	this.dino;
+	this.pixelSize = (1 / window.devicePixelRatio);
+	if (this.pixelSize < 1) {
+		this.pixelSize = parseFloat(this.pixelSize.toPrecision(2));
+	}
+	this.gravityForce = this.pixelSize*1.5;
+	this.masterSpeed = this.pixelSize*8;
+	this.initialize = function() {
+		document.body.style.setProperty('--pixel-size',this.pixelSize);
+		var dino = new Dino();
+		this.dino = dino;
+		$('#ground').animate({
+			'opacity':'1'
+		},400)
+		dino.div.animate({
+			'top': dino.groundY + 'px',
+			'opacity': '1'
+		},800,function(){
+			dino.canJump = true;
+		}).animate({
+			'opacity': '1'
+		},400);
+	}
+	this.startScrolling = function() {
+		this.started = true;
+		this.dino.startWalking();
+		requestAnimationFrame(gameLoop);
+	}
+	this.restart = function() {
+		this.started = false;
+		this.counter = 0;
+		this.cactii.length = 0;
+		$('.cactus').remove();
+		this.dino.revive();
+		this.restartedAt = this.counter;
 	}
 }
 function Dino() {
@@ -72,18 +55,18 @@ function Dino() {
 	this.diedAt = -1;
 	this.width = this.div.width();
 	this.height = this.div.height();
-	this.jumpForce = pixelSize*24
+	this.jumpForce = game.pixelSize*24
 	this.y = function() {
 		return this.div.position().top;
 	}
 	this.velocity = {x:0, y:0};
-	this.terminalVelocity = pixelSize*24;
+	this.terminalVelocity = game.pixelSize*24;
 	this.groundY = this.div.position().top;
 	this.applyVelocity = function() {
 		if (this.y() < this.groundY || this.velocity.y) {
 			var currentY = this.y()
-			if (dino.y() !== dino.groundY && (this.velocity.y + gravityForce) < this.terminalVelocity) {
-				this.velocity.y += gravityForce;
+			if (this.y() !== this.groundY && (this.velocity.y + game.gravityForce) < this.terminalVelocity) {
+				this.velocity.y += game.gravityForce;
 			}
 			if ((this.y()+this.velocity.y) <= this.groundY) {
 				this.div.css({
@@ -124,11 +107,10 @@ function Dino() {
 		clearInterval(this.walkCycle);
 	}
 	this.die = function() {
-		this.diedAt = counter;
+		this.diedAt = game.counter;
 		this.velocity.y = this.terminalVelocity;
 		clearInterval(this.walkCycle);
 		this.div.addClass('dead');
-		loop = undefined;
 	}
 	this.revive = function() {
 		this.foot = "left";
@@ -137,19 +119,20 @@ function Dino() {
 		this.div.removeClass('walk-1');
 		this.div.removeClass('dead');
 		this.div.addClass('standing');
+		var self = this;
 		setTimeout(function(){
-			dino.canJump = true;
+			self.canJump = true;
 		},500)
 	}
 	this.div.css({
 		'top' : -this.height
 	})
 }
-function Cactus(type,speed) {
-	this.html = `<div class="cactus" id="cactus-`+cactii.length+`"></div>`;
+function Cactus(speed) {
+	this.html = `<div class="cactus" id="cactus-`+game.cactii.length+`"></div>`;
 	$('#stage').append(this.html);
-	this.div = $("#cactus-"+cactii.length);
-	this.speed = speed*pixelSize;
+	this.div = $("#cactus-"+game.cactii.length);
+	this.speed = speed * game.pixelSize;
 	this.spent = false;
 	this.width = this.div.width();
 	this.height = this.div.height();
@@ -159,19 +142,22 @@ function Cactus(type,speed) {
 	this.y = function(){
 		return this.div.position().top;
 	}
-	this.moveLeft = function(speed){
+	this.moveLeft = function() {
 		var currentX = this.div.position().left;
+		var moveSpeed = this.speed + game.masterSpeed
+		var newX = currentX-moveSpeed;
 		this.div.css({
-			'left': (currentX-this.speed) +'px'
-		},this)
-		if ((currentX-this.speed) <= -this.width) { // if offscreen left
+			'left': newX+'px'
+		})
+		if (newX <= -this.width) { // if offscreen left
 			this.div.remove();
 			this.spent = true;
 		}
 	}
-	cactii.push(this);
+	game.cactii.push(this);
 }
-Cactus.prototype.touchingDino = function() {
+Cactus.prototype.touchingDino = function () {
+	var dino = game.dino;
 	var touching = false;
 	var toRight = this.x() > (dino.xSpot-(dino.width/2));
 	var dinoX = dino.xSpot;
@@ -181,104 +167,9 @@ Cactus.prototype.touchingDino = function() {
 	}
 	return touching;
 }
-function gameLoop(time) {
-	dino.applyVelocity();
-	if (gStartedGame && dino.diedAt < 0) {
-		for (var i=0; i<cactii.length; i++) {
-			var cactus = cactii[i];
-			if (!cactus.spent) {
-				cactus.moveLeft(gMasterSpeed+cactus.speed)
-				if (cactus.touchingDino()) {
-					dino.die();
-					$('#restart-button').removeClass('hidden')
-					$('#restart-button').css({
-						'transform': 'scale(1)'
-					})
-				}
-			}
-		}
-		if (randomInt(0,2) && counter.mod(43)) {
-			new Cactus("tall",12);
-		}
-		if (counter.mod(480)) {
-			gMasterSpeed++;
-		}
-		
-	} else {
-		if (restartedAt===counter) {
-			return
-		}
-	}
-	counter++
-	requestAnimationFrame(gameLoop);
-}
 Number.prototype.mod = function(num) {
 	return this % num === 0;
 }
 function randomInt(min,max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
-}
-function Touch(touchEvent) {
-	this.identifier = touchEvent.identifier;
-	this.startTime = counter;
-	this.x = touchEvent.clientX;
-	this.y = touchEvent.clientY;
-	this.startSpot = { x: this.x, y: this.y };
-	this.endSpot = {};
-	this.moveDuration = function () {
-		return counter - this.startTime;
-	}
-	this.moveDistance = function () {
-		var distance = {};
-		distance.x = this.x - this.startSpot.x;
-		distance.y = this.y - this.startSpot.y;
-		return distance
-	}
-}
-
-
-
-var touchTime;
-var currentTouches = []
-
-function touchStart(event) {
-	// event.preventDefault();
-	touchTime = Date.now();
-	for (var i=0; i<event.changedTouches.length; i++) {
-		var newTouch = event.changedTouches[i]
-		console.log("starting " + newTouch.identifier)
-		currentTouches.push(new Touch(newTouch));
-		debug ? $('#debug').append(`<span id="touch-` + newTouch.identifier + `">` + newTouch.identifier + `</span>`) : false;
-  }
-}
-function touchMove(event) {
-	// event.preventDefault();
-	var movingTouches = [];
-	for (var i=0; i<event.changedTouches.length; i++) {
-    movingTouches.push(copyTouch(event.changedTouches[i]));
-  }
-	movingTouches.forEach(function (touchEvent, i) {
-		var touchObject = new Touch(touchEvent);
-		// take each touch that moved...
-		currentTouches.forEach(function (existingTouch, j) {
-			//...find it in the list...
-			if (touchObject.identifier === existingTouch.identifier) {
-				//...replace it with the new one
-				currentTouches[j] = touchObject;
-				console.log("moved " + currentTouches[j].identifier);
-				debug ? $(`#touch-` + currentTouches[j].identifier).css({ 'color': 'green' }) : false;
-			}
-		});
-	});
-}
-function touchEnd(event) {
-	// event.preventDefault();
-	for (var i=0; i<event.changedTouches.length; i++) {
-    console.log("ending " + event.changedTouches[i].identifier);
-		currentTouches.push(copyTouch(event.changedTouches[i]));
-		debug ? $(`#touch-` + currentTouches[i].identifier).remove() : false;
-  }
-}
-function copyTouch(touch) {
-  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
 }
