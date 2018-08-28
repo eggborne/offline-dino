@@ -63,7 +63,6 @@ function Touch(touchEvent) {
 }
 var currentTouches = []
 function touchStart(event) {
-	// event.preventDefault();
 	for (var i=0; i<event.changedTouches.length; i++) {
 		var newTouch = event.changedTouches[i]
 		currentTouches.push(new Touch(newTouch));
@@ -71,7 +70,6 @@ function touchStart(event) {
 	spaceAction()
 }
 function touchMove(event) {
-	// event.preventDefault();
 	var movingTouches = [];
 	for (var i=0; i<event.changedTouches.length; i++) {
     movingTouches.push(copyTouch(event.changedTouches[i]));
@@ -94,7 +92,6 @@ function touchMove(event) {
 	});
 }
 function touchEnd(event) {
-	// event.preventDefault();
 	Array.from(event.changedTouches).forEach(function (touch, i) {
 		currentTouches.splice(i, 1);
 	});
@@ -131,7 +128,7 @@ function postToDebug() {
 	$('#debug-touches').html("")
 	currentTouches.forEach(function(touch, i) {
 		if (touch.x) {
-			$('#debug-touches').append("x: " + touch.x + " | y: " + touch.y + "<br />startTime: " + touch.startTime + "<br />duration: " + touch.getDuration());
+			$('#debug-touches').append("x: " + touch.x + " | y: " + touch.y + "<br />duration: " + touch.getDuration());
 			if (i < currentTouches.length - 1) {
 				$('#debug-touches').append(", <br />")
 			}
