@@ -11,7 +11,7 @@ function Game() {
 	this.counter = 0;
 	this.restartedAt = -1;
 	this.dino;
-	this.pixelSize = (1 / window.devicePixelRatio);
+	this.pixelSize = parseFloat(1 / window.devicePixelRatio);
 	if (this.pixelSize < 1) {
 		this.pixelSize = parseFloat(this.pixelSize.toPrecision(2));
 	}
@@ -51,6 +51,7 @@ function Dino() {
 	this.div = $('#dino');
 	this.xSpot = this.div.position().left + (this.div.width()*0.75);
 	this.canJump = false;
+	this.canSwipe = true;
 	this.foot = "left";
 	this.diedAt = -1;
 	this.width = this.div.width();
@@ -119,6 +120,7 @@ function Dino() {
 		this.div.removeClass('walk-1');
 		this.div.removeClass('dead');
 		this.div.addClass('standing');
+		this.velocity.x = this.velocity.y = 0;
 		var self = this;
 		setTimeout(function(){
 			self.canJump = true;
