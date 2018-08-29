@@ -1,3 +1,7 @@
+html {
+	position:fixed;
+	overflow: hidden;
+}
 #debug {
 	position: fixed;
 	width:80%;
@@ -7,10 +11,7 @@
 	text-align: left;
 	font-family: sans-serif;
 	font-size:0.8em;
-
-}
-html {
-	overflow: hidden;
+	display:none;
 }
 body {
 	position: fixed;
@@ -32,6 +33,16 @@ body {
 	height:100%;
 	overflow: hidden;
 }
+#message-area {
+	position:absolute;
+	color:black;
+	opacity: 0;
+	width: 100%;
+	height: calc(192px * var(--pixel-size));
+	font-size: calc(24px * var(--pixel-size));
+	text-align:center;
+	top: 3%;
+}
 #ground {
 	position:relative;
 	width: 100%;
@@ -49,8 +60,29 @@ body {
 	left: 20%;
 	z-index: 2;
 	opacity: 0;
+	transform-origin: center;
 	background-repeat: no-repeat;
 	background-size:contain;
+	overflow: hidden;
+	transform: rotate(0);
+	animation-name: backflip;
+  animation-duration: 2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+  animation-play-state: paused;
+}
+#restart-button {
+	cursor: pointer;
+	position: absolute;
+	width: calc(72px * var(--pixel-size));
+	height: calc(72px * var(--pixel-size));
+	top: 30%;
+	background-image: url("../img/restartbutton.png");
+	background-repeat: no-repeat;
+	background-size: 100%;
+	margin-left:calc(50vw - calc(36px * var(--pixel-size)));
+	transform: scale(0.8);
+	transition: all 200ms ease;
 	overflow: hidden;
 }
 .intro-spot {
@@ -67,13 +99,11 @@ body {
 }
 .duck-0 {
 	background-image: url("../img/dinoduck0.png");
-	width: calc(118px * var(--pixel-size));
-	height: calc(60px * var(--pixel-size));
+	background-position:bottom;
 }
 .duck-1 {
 	background-image: url("../img/dinoduck1.png");
-	width: calc(118px * var(--pixel-size));
-	height: calc(60px * var(--pixel-size));
+	background-position:bottom;
 }
 .dead {
 	background-image: url("../img/dinodead.png");
@@ -94,20 +124,6 @@ body {
 	pointer-events: none;
 	overflow: hidden;
 }
-#restart-button {
-	cursor: pointer;
-	position: absolute;
-	width: calc(72px * var(--pixel-size));
-	height: calc(72px * var(--pixel-size));
-	top: 30%;
-	background-image: url("../img/restartbutton.png");
-	background-repeat: no-repeat;
-	background-size: 100%;
-	margin-left:calc(50vw - calc(36px * var(--pixel-size)));
-	transform: scale(0.8);
-	transition: all 200ms ease;
-	overflow: hidden;
-}
 @media screen and (orientation:portrait) {
 	#ground {
 		top: 40vh;
@@ -120,9 +136,17 @@ body {
 		top: calc(40vh + calc(14px * var(--pixel-size)));
 	}
 	#restart-button {
-		width: calc(100px * var(--pixel-size));
-		height: calc(100px * var(--pixel-size));
-		margin-left:calc(50vw - calc(50px * var(--pixel-size)));
+		width: calc(160px * var(--pixel-size));
+		height: calc(160px * var(--pixel-size));
+		margin-left:calc(50vw - calc(80px * var(--pixel-size)));
 		top: 40vw;
+	}
+}
+@media screen and (orientation:landscape) and (max-height: 400px) {
+	#restart-button {
+		width: calc(160px * var(--pixel-size));
+		height: calc(160px * var(--pixel-size));
+		margin-left:calc(50vw - calc(80px * var(--pixel-size)));
+		top: 20vh;
 	}
 }

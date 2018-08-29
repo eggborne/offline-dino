@@ -22,6 +22,16 @@ function gameLoop() {
 			return // breaks out of loop
 		}
 	}
+	if (game.currentTouches.length) {
+		var touch = game.currentTouches[0];
+		// check if it's been down long enough and moved little enough to be a tap
+		var duration = touch.getDuration();
+		var distance = touch.getDistance();
+		if (duration === game.tapTime 
+			&& Math.abs(distance.x) <= game.tapDistance && Math.abs(distance.y) < game.tapDistance) {
+				spaceAction()
+		}
+	}
 	if (debug) {postToDebug()};
 	game.counter++;
 	requestAnimationFrame(gameLoop);

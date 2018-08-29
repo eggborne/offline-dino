@@ -1,28 +1,8 @@
-var gestureRules = {
-	swipe: {
-		north: {
-			distance: (-220*game.pixelSize),
-			duration: 15
-		},
-		south: {
-			distance: (220*game.pixelSize),
-			duration: 15
-		},
-		west: {
-			distance: (-180*game.pixelSize),
-			duration: 15
-		},
-		east: {
-			distance: (180*game.pixelSize),
-			duration: 15
-		}
-	}
-}
 function Touch(touchEvent) {
 	this.identifier = touchEvent.identifier;
 	this.startTime = game.counter;
-	this.x = touchEvent.pageX;
-	this.y = touchEvent.pageY;
+	this.x = Math.round(touchEvent.pageX);
+	this.y = Math.round(touchEvent.pageY);
 	this.startSpot = { x: this.x, y: this.y };
 	this.endSpot = {};
 	this.getDuration = function () {
@@ -38,63 +18,77 @@ function Touch(touchEvent) {
 		var fullSwipe = ""
 		var duration = this.getDuration();
 		var distance = this.getDistance();
-		if (distance.y <= gestureRules.swipe.north.distance && duration <= gestureRules.swipe.north.duration) {
+		
+		if (distance.y <= game.gestureRules.swipe.north.distance && duration <= game.gestureRules.swipe.north.duration) {
 			fullSwipe += "north";
 		}
-		if (distance.y >= gestureRules.swipe.south.distance && duration <= gestureRules.swipe.south.duration) {
+		if (distance.y >= game.gestureRules.swipe.south.distance && duration <= game.gestureRules.swipe.south.duration) {
 			fullSwipe += "south";
 		}
-		if (distance.x <= gestureRules.swipe.west.distance && duration <= gestureRules.swipe.west.duration) {
+		if (distance.x <= game.gestureRules.swipe.west.distance && duration <= game.gestureRules.swipe.west.duration) {
 			fullSwipe += "west";
 		}
-		if (distance.x >= gestureRules.swipe.east.distance && duration <= gestureRules.swipe.east.duration) {
+		if (distance.x >= game.gestureRules.swipe.east.distance && duration <= game.gestureRules.swipe.east.duration) {
 			fullSwipe += "east";
 		}
 		if (fullSwipe) {
+			return fullSwipe;
+			// do something with swipeActions[fullSwipe]
 			$('#debug-swipe').html("swiped " + fullSwipe.toUpperCase() + " in " + this.getDuration() + "!");
 			setTimeout(function () {
 				$('#debug-swipe').html("&nbsp;")
-				game.dino.canSwipe = true
-			}, 600);
+			}, 800);
 		}
-		
-		return fullSwipe;
 	}
 }
-var currentTouches = []
 function touchStart(event) {
 	for (var i=0; i<event.changedTouches.length; i++) {
 		var newTouch = event.changedTouches[i]
-		currentTouches.push(new Touch(newTouch));
+		game.currentTouches.push(new Touch(newTouch));
 	}
-	spaceAction()
+	if (!game.started) {
+		game.startScrolling();
+	}
+	// spaceAction()
 }
 function touchMove(event) {
 	var movingTouches = [];
 	for (var i=0; i<event.changedTouches.length; i++) {
     movingTouches.push(copyTouch(event.changedTouches[i]));
 	}
-	movingTouches.forEach(function (touchEvent, i) {
+	movingTouches.forEach(function(touchEvent, i) {
 		var touchObject = new Touch(touchEvent);
 		// take each touch that moved...
-		currentTouches.forEach(function (existingTouch, j) {
+		game.currentTouches.forEach(function (existingTouch, j) {
 			//...find it in the list...
 			if (touchObject.identifier === existingTouch.identifier) {
 				//...replace the old {x,y} with the new one
-				currentTouches[j].x = touchObject.x;
-				currentTouches[j].y = touchObject.y;
-				if (game.dino.canSwipe && currentTouches[j].getSwipe()) {
+				game.currentTouches[j].x = touchObject.x;
+				game.currentTouches[j].y = touchObject.y;
+				// check if it has completed a swipe
+				var swiped = game.currentTouches[j].getSwipe()
+				if (swiped && game.dino.canSwipe) {
 					game.dino.canSwipe = false
-					
+					setTimeout(function () {
+						game.dino.canSwipe = true;
+					}, 400);
+					game.swipeActions[swiped]()
 				}
 			}
 		});
 	});
 }
 function touchEnd(event) {
-	Array.from(event.changedTouches).forEach(function (touch, i) {
-		currentTouches.splice(i, 1);
+	Array.from(event.changedTouches).forEach(function(touch, i) {
+		var duration = game.currentTouches[i].getDuration();
+		var distance = game.currentTouches[i].getDistance();
+		if (duration <= game.tapTime 
+			&& distance.x <= game.tapDistance && distance.y < game.tapDistance) {
+				// spaceAction()
+		}
+		game.currentTouches.splice(i, 1);
 	});
+	
 }
 function copyTouch(touch) {
   return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
@@ -111,8 +105,9 @@ function setInputs() {
 		if (event.keyCode == 32) {
 			spaceAction()
 		}
+		// arrow keys for swipe actions?
 	};
-	document.body.addEventListener('mousedown',spaceAction,true);
+	// document.body.addEventListener('mousedown',spaceAction,true);
 	document.body.addEventListener('touchstart',touchStart,true);
 	document.body.addEventListener('touchmove',touchMove,true);
 	document.body.addEventListener('touchend',touchEnd,true);
@@ -126,10 +121,11 @@ function setInputs() {
 }
 function postToDebug() {
 	$('#debug-touches').html("")
-	currentTouches.forEach(function(touch, i) {
+	game.currentTouches.forEach(function(touch, i) {
 		if (touch.x) {
-			$('#debug-touches').append("x: " + touch.x + " | y: " + touch.y + "<br />duration: " + touch.getDuration());
-			if (i < currentTouches.length - 1) {
+			$('#debug-touches').append("x: " + touch.x + " | y: "
+				+ touch.y + "<br />duration: " + touch.getDuration());
+			if (i < game.currentTouches.length - 1) {
 				$('#debug-touches').append(", <br />")
 			}
 		}
